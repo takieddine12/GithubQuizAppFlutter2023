@@ -39,6 +39,7 @@ dependencies:
   flutter_bloc:
   get:
   firebase_core:
+  firebase_auth:
   firebase_database:
   google_fonts:
   shared_preferences:
