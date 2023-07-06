@@ -4,8 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
 
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  FirebaseDatabase _firebaseDatabase  = FirebaseDatabase.instance;
+  final FirebaseDatabase _firebaseDatabase  = FirebaseDatabase.instance;
 
   // TODO : GET QUIZ BY CATEGORY
   Future<DataSnapshot> getQuiz(String category , String quizIndex) async {

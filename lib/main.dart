@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_app/auth_manager.dart';
 import 'package:quiz_app/bloc/bloc_main.dart';
 import 'package:quiz_app/service/auth_service.dart';
 import 'package:quiz_app/ui/category_screen.dart';
@@ -15,15 +19,18 @@ void main() async {
   await Firebase.initializeApp();
   runApp(BlocProvider(
     create: (_) => BlocMain(AuthService()),
-    child: GetMaterialApp(
-      home: const MyApp(),
-      debugShowCheckedModeBanner: false,
-      getPages: [
-        GetPage(name: "/category", page: () => const CategoryScreen()),
-        GetPage(name: "/home", page: () => const HomeScreen()),
-        GetPage(name: "/quiz", page: () => const QuizScreen()),
-        GetPage(name: "/login", page: () => const LoginScreen())
-      ],
+    child: Provider<AuthManager>(
+      create: (_) => AuthManager(GoogleSignIn(scopes: ['email','profile'])),
+      child: GetMaterialApp(
+        home: const MyApp(),
+        debugShowCheckedModeBanner: false,
+        getPages: [
+          GetPage(name: "/category", page: () => const CategoryScreen()),
+          GetPage(name: "/home", page: () => const HomeScreen()),
+          GetPage(name: "/quiz", page: () => const QuizScreen()),
+          GetPage(name: "/login", page: () => const LoginScreen())
+        ],
+      ),
     ),
   ));
 }

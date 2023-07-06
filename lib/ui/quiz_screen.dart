@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_toastr/flutter_toastr.dart';
 import 'package:get/get.dart';
+import 'package:timer_count_down/timer_controller.dart';
+import 'package:timer_count_down/timer_count_down.dart';
 import 'package:quiz_app/bloc/bloc_main.dart';
 import 'package:quiz_app/bloc/bloc_state.dart';
 import 'package:quiz_app/styles.dart';
@@ -16,6 +21,12 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+
+  final CountdownController _countdownController = CountdownController(autoStart: true);
+  final List<int> _correctAnswers = [];
+  bool isAnswerCorrect = false;
+  var buttonText = "Next";
+  var isVisible = false;
   var selectedCategory = "";
   var questionIndex = 1;
   @override
@@ -23,12 +34,11 @@ class _QuizScreenState extends State<QuizScreen> {
     // TODO: implement initState
     super.initState();
     selectedCategory  = Get.arguments[0];
-    BlocProvider.of<BlocMain>(context)
+    BlocProvider.of<BlocMain>(context).add(FetchQuizByCategoryEvent(selectedCategory, questionIndex.toString()));
   }
 
   @override
   Widget build(BuildContext context) {
-
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -38,30 +48,43 @@ class _QuizScreenState extends State<QuizScreen> {
             BlocBuilder<BlocMain,BlocState>(
               builder: (context, state){
                 if(state is LOADING){
-                  return const Center(child: CircularProgressIndicator(color: Colors.indigo,),);
+                  return Container();
                 }
                 else if (state is ERROR){
                   return Container();
                 }
-                else {
-                  var quizModel = (state as FetchQuizByCategoryState).quizModel;
+                else  if(state is FetchQuizByCategoryState){
+                  var quizModel = state.quizModel;
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment : CrossAxisAlignment.center,
                     children: [
-                      Text("Question : $questionIndex",style: getStyle().copyWith(fontSize: 25,color: Colors.white),),
+                      Center(child: Text("Question $questionIndex",style: getStyle().copyWith(fontSize: 20,color: Colors.white),textAlign: TextAlign.center,)),
                       const SizedBox(height: 20,),
-                      Container(
-                        height: 80,
-                        width: 80,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(60),
-                            color: Colors.white
-                        ),
-                        child: Center(
-                          child: Text('30',style: getStyle().copyWith(fontSize: 20,color: Colors.black),),
-                        ),
-                      ),
+                      Countdown(
+                        controller: _countdownController,
+                        seconds: 30,
+                        build: (_,time){
+                          return Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(60),
+                                color: Colors.white
+                            ),
+                            child: Center(
+                              child: Text(time < 10 ? time.toString().substring(0,1) : time.toString().substring(0,2),style: getStyle().copyWith(fontSize: 20,color: Colors.black),),
+                            ),
+                          );
+                        },
+                        interval: const Duration(seconds: 1),
+                        onFinished: (){
+                          questionIndex++;
+                          if(questionIndex == 10){
+                            buttonText = 'Finish';
+                          }
+                          BlocProvider.of<BlocMain>(context).add(FetchQuizByCategoryEvent(selectedCategory, questionIndex.toString()));
+                        },),
                       Container(
                         width: double.maxFinite,
                         height: 200,
@@ -71,35 +94,90 @@ class _QuizScreenState extends State<QuizScreen> {
                             borderRadius: BorderRadius.circular(16)
                         ),
                         child: Center(
-                          child: Text(quizModel.question,style: getStyle().copyWith(fontSize: 20,color: Colors.black),),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 30,right: 30),
+                            child: Text(quizModel.question,style: getStyle().copyWith(fontSize: 20,color: Colors.black),textAlign: TextAlign.center,),
+                          ),
                         ),
                       ),
                       customContainer(quizModel.answer1,"1",(){
-
+                        if(quizModel.correctAnswer.toString()  == quizModel.answer1.toString()){
+                          setState(() {
+                            isVisible = true;
+                          });
+                        } else {}
                       }),
-                      customContainer(quizModel.answer1,"2",(){
+                      customContainer(quizModel.answer2,"2",(){
+                        if(quizModel.correctAnswer.toString() == quizModel.answer2.toString()){
+                          setState(() {
+                            isVisible = true;
+                          });
+                        } else {
 
+                        }
                       }),
-                      customContainer(quizModel.answer1,"3",(){
+                      customContainer(quizModel.answer3,"3",(){
+                        if(quizModel.correctAnswer.toString()  == quizModel.answer3.toString()){
+                          setState(() {
+                            isVisible = true;
+                          });
+                        } else {
 
+                        }
                       }),
-                      customContainer(quizModel.answer1,"4",(){
+                      customContainer(quizModel.answer4,"4",(){
+                        if(quizModel.correctAnswer.toString() == quizModel.answer4.toString()){
+                          setState(() {
+                            isVisible = true;
+                          });
+                        } else {
 
+                        }
                       }),
                       const SizedBox(height: 15,),
-                      Container(
-                        width: 250,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.indigo
-                        ),
-                        child:  Center(
-                          child: Text('Next',style: getStyle().copyWith(fontSize: 15 , color: Colors.white),),
+                      Visibility(
+                        visible : isVisible,
+                        child: GestureDetector(
+                          onTap : (){
+                            if(buttonText.toString() == 'Finish'){
+                              print('List Size ${_correctAnswers.length}');
+                              if(_correctAnswers.length == 9){
+                                _countdownController.pause();
+                                showSuccessDialog();
+                              } else {
+                                _countdownController.pause();
+                                showFailureDialog();
+                              }
+                            } else {
+                              questionIndex++;
+                              if(questionIndex == 10){
+                                buttonText = 'Finish';
+                              }
+                              _correctAnswers.add(questionIndex);
+                              BlocProvider.of<BlocMain>(context).add(FetchQuizByCategoryEvent(selectedCategory, questionIndex.toString()));
+                              setState(() {
+                                isVisible = false;
+                              });
+                            }
+                          },
+                          child: Container(
+                            width: 250,
+                            height: 50,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: Colors.indigo
+                            ),
+                            child:  Center(
+                              child: Text(buttonText,style: getStyle().copyWith(fontSize: 15 , color: Colors.white),),
+                            ),
+                          ),
                         ),
                       )
                     ],
                   );
+                }
+                else {
+                   return Container();
                 }
               },
             )
@@ -113,7 +191,7 @@ class _QuizScreenState extends State<QuizScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.only(left: 16,right: 16,top: 8),
+        padding: const EdgeInsets.only(left: 30,right: 30,top: 8),
         child: Container(
           height: 50,
           decoration: BoxDecoration(
@@ -140,4 +218,35 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
     );
   }
+  showSuccessDialog() {
+      showDialog(
+          barrierDismissible: false,
+          context: context, builder: (context) {
+        return AlertDialog(
+          title: const Text('Quiz!'),
+          content: const Text('Congrats , You have successfully completed the quiz'),
+          actions: [
+            ElevatedButton(onPressed: (){
+              Get.offNamed("/home");
+            }, child: const Text('Done'))
+          ],
+        );
+      });
+  }
+  showFailureDialog() {
+    showDialog(
+        barrierDismissible: false,
+        context: context, builder: (context) {
+      return AlertDialog(
+        title: const Text('Quiz!'),
+        content: const Text('Sorry , You have failed to complete the quiz'),
+        actions: [
+          ElevatedButton(onPressed: (){
+            Get.offNamed("/home");
+          }, child: const Text('Done'))
+        ],
+      );
+    });
+  }
+
 }

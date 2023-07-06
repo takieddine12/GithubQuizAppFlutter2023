@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_app/auth_manager.dart';
 import 'package:quiz_app/styles.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -39,8 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
                            Text("Login to take quiz challenges",style: getStyle().copyWith(fontSize: 15,color: Colors.grey)),
                            const SizedBox(height: 10,),
                            GestureDetector(
-                             onTap: (){
-                               signInWithGoogle();
+                             onTap: () async {
+                                Provider.of<AuthManager>(context , listen: false).signInWithGoogle();
+                               ///await context.read<AuthManager>().signInWithGoogle();
                              },
                              child: Container(
                                width: double.maxFinite,
@@ -104,20 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void signInWithGoogle() async  {
-    GoogleSignIn googleSignIn  = GoogleSignIn(scopes: ["email","profile"]);
-    try {
-      // Sign in with Google
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-      if (googleUser != null) {
-        // Get the authentication details
-        Get.offNamed('/home',arguments: [googleUser.email,googleUser.displayName,googleUser.photoUrl]);
-      }
-    } catch (error) {
-      print('Error signing in with Google: $error');
-    }
-  }
 
   void signInWithFacebook() {}
 }

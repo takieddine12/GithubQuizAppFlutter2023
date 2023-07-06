@@ -43,7 +43,10 @@ dependencies:
   firebase_database:
   google_fonts:
   shared_preferences:
-  google_sign_in:
+  google_sign_in: ^5.0.0
+  flutter_toastr:
+  provider:
+  timer_count_down: ^2.2.2
 
 dev_dependencies:
   flutter_test:

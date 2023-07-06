@@ -9,7 +9,7 @@ import 'package:quiz_app/models/quiz_model.dart';
 
 import '../service/auth_service.dart';
 
-class BlocMain extends Bloc<BlocEvents,BlocState> {
+ class BlocMain extends Bloc<BlocEvents,BlocState> {
   late final AuthService _authService;
   BlocMain(this._authService) : super(INITIAL()){
     on<FetchQuizByCategoryEvent>(_fetchQuiz);
@@ -22,11 +22,13 @@ class BlocMain extends Bloc<BlocEvents,BlocState> {
       DataSnapshot snapshot = await _authService.getQuiz(event.category,event.quizIndex);
       if(snapshot.exists){
         var question = snapshot.child("Question").value.toString();
-        var answer1 = snapshot.child("answer1").value.toString();
-        var answer2 = snapshot.child("answer2").value.toString();
-        var answer3 = snapshot.child("answer3").value.toString();
-        var answer4 = snapshot.child("answer4").value.toString();
-        QuizModel quizModel = QuizModel(question, answer1, answer2, answer3, answer4);
+        var answer1 = snapshot.child("Answer1").value.toString();
+        var answer2 = snapshot.child("Answer2").value.toString();
+        var answer3 = snapshot.child("Answer3").value.toString();
+        var answer4 = snapshot.child("Answer4").value.toString();
+        var correctAnswer = snapshot.child("output").value.toString();
+
+        QuizModel quizModel = QuizModel(question, answer1, answer2, answer3, answer4,correctAnswer);
         emit(FetchQuizByCategoryState(quizModel));
       } else {
         emit(LOADING());

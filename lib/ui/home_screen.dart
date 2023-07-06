@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
+import 'package:quiz_app/auth_manager.dart';
 import 'package:quiz_app/styles.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,16 +17,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   
   final List<String> _categories = [
-    "Football","Science","Animals","Geography","History","Capitals"
+    "Animals","Geography","History"
   ];
 
   final List<String> _icons = [
-    "assets/images/foot.png",
-    "assets/images/science.png",
     "assets/images/pets.png",
     "assets/images/geography.png",
     "assets/images/history.png",
-    "assets/images/foot.png"
   ];
 
   late String email;
@@ -33,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     assignValues();
   }
@@ -188,6 +186,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void assignValues()  async {
+    GoogleSignInAccount? googleUser = Provider.of<AuthManager>(context).googleAccount;
+    setState(() {
+      email = googleUser!.email;
+      displayName = googleUser.displayName!;
+      photoUrl = googleUser.photoUrl!;
+    });
     var args = Get.arguments;
     setState(() {
       email = args[0];
