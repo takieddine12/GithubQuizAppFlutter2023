@@ -219,34 +219,120 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
   showSuccessDialog() {
-      showDialog(
-          barrierDismissible: false,
-          context: context, builder: (context) {
-        return AlertDialog(
-          title: const Text('Quiz!'),
-          content: const Text('Congrats , You have successfully completed the quiz'),
-          actions: [
-            ElevatedButton(onPressed: (){
-              Get.offNamed("/home");
-            }, child: const Text('Done'))
-          ],
-        );
-      });
+    showDialog(
+        context: context,
+        builder: (_){
+          return Container(
+             decoration: BoxDecoration(
+               borderRadius: BorderRadius.circular(30),
+             ),
+            child: Column(
+              children: [
+                 Container(
+                   width: double.maxFinite,
+                   height: 250,
+                   decoration: const BoxDecoration(
+                     color: Colors.green
+                   ),
+                   child: Center(
+                     child: SizedBox(
+                       height: 80,
+                       width: 80,
+                       child: Card(
+                         color: Colors.green.shade500,
+                         shape: const CircleBorder(side: BorderSide.none),
+                         child: const Center(
+                           child: Icon(Icons.check, size: 30,color: Colors.white,),
+                         ),
+                       ),
+                     ),
+                   ),
+                 ),
+                 const SizedBox(height: 20,),
+                 Center(child: Text('Success',style: getStyle().copyWith(fontSize: 20 , color: Colors.black),)),
+                 const SizedBox(height: 10,),
+                 Padding(
+                   padding: const EdgeInsets.only(left: 30,right: 30),
+                   child: Text('Congrats , You have successfully completed the quiz',
+                    style: getStyle().copyWith(fontSize: 20 , color: Colors.black54),textAlign: TextAlign.center,),
+                 ),
+                 const SizedBox(height: 20,),
+                 GestureDetector(
+                   onTap: (){
+                     Get.offNamed('/home');
+                   },
+                   child: Container(
+                     decoration: BoxDecoration(
+                       borderRadius: BorderRadius.circular(20),
+                       color: Colors.indigo
+                     ),
+                     child: Center(
+                       child: Text('Done',style: getStyle().copyWith(fontSize: 15),),
+                     ),
+                   ),
+                 )
+              ],
+            ),
+          );
+        });
   }
   showFailureDialog() {
     showDialog(
-        barrierDismissible: false,
-        context: context, builder: (context) {
-      return AlertDialog(
-        title: const Text('Quiz!'),
-        content: const Text('Sorry , You have failed to complete the quiz'),
-        actions: [
-          ElevatedButton(onPressed: (){
-            Get.offNamed("/home");
-          }, child: const Text('Done'))
-        ],
-      );
-    });
+        context: context,
+        builder: (_){
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  height: 250,
+                  decoration: const BoxDecoration(
+                      color: Colors.green
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      height: 80,
+                      width: 80,
+                      child: Card(
+                        color: Colors.green.shade500,
+                        shape: const CircleBorder(side: BorderSide.none),
+                        child: const Center(
+                          child: Icon(Icons.check, size: 30,color: Colors.white,),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20,),
+                Center(child: Text('Failure',style: getStyle().copyWith(fontSize: 20 , color: Colors.black),)),
+                const SizedBox(height: 10,),
+                Padding(
+                  padding: const EdgeInsets.only(left: 30,right: 30),
+                  child: Text('Sorry , You failed to pass the quiz',
+                    style: getStyle().copyWith(fontSize: 20 , color: Colors.black54),textAlign: TextAlign.center,),
+                ),
+                const SizedBox(height: 20,),
+                GestureDetector(
+                  onTap: (){
+                    Get.offNamed('/home');
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.indigo
+                    ),
+                    child: Center(
+                      child: Text('Done',style: getStyle().copyWith(fontSize: 15),),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
   }
 
 }
